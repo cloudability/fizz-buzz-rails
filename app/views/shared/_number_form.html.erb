@@ -1,0 +1,48 @@
+<div class="form">
+  <h1><%= @message || "&nbsp;".html_safe %></h1>
+
+  <form action="<%= answer_url %>" method="POST">
+    <input type="text" name="number" class="number" placeholder="Enter a Number"/>
+  </form>
+</div>
+
+<%- content_for(:javascript) do %>
+  <script type="text/javascript">
+    var timer = null;
+
+    function doProcessInput(input) {
+        var val = $(input).val();
+
+        if(val.match(/^\s*\d+\s*$/)) {
+            $(input).parents('form').submit();
+        } else if(val.match(/^\s*$/)) {
+          // Don't do anything.
+        } else {
+            var $div = $('<div/>').text("That's not a number!");
+            $(input).after($div);
+        }
+    }
+
+    $('input.number').on('keydown', function() {
+        // this is a little wasteful...should only do it if need be!
+        $(this).siblings('div').remove();
+
+        if(timer) {
+          window.clearTimeout(timer);
+        }
+
+        // Save this for later.
+        var _this = this;
+
+        timer = window.setTimeout(function() {
+          doProcessInput(_this);
+        }, 500);
+    });
+
+    $('input.number').on('change', function() {
+        doProcessInput(this);
+    });
+
+    $('input.number').focus();
+  </script>
+<%- end %>
